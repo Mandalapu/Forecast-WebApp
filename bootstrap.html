@@ -1,0 +1,1421 @@
+<html>
+<head>
+<meta charset="utf-8">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <script src="http://openlayers.org/api/OpenLayers.js"></script>
+  <script src="http://openweathermap.org/js/OWM.OpenLayers.1.3.4.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+  <!-- // <script src="/javascripts/application.js" type="text/javascript" charset="utf-8" async defer></script> -->
+  <script type="text/javascript">
+   function clearall()
+   {
+   // alert("coming into reset");
+   document.forms['myform'].streetaddress.value="";
+   document.forms['myform'].mycity.value="";
+   document.forms['myform'].state.value="manu";
+   document.forms['myform'].degree.value="Farenheit";
+   $("#pagebottom").hide();
+  $("label.error").remove();
+   
+   }
+   $(document).ready(function() { 
+$(".error").css("color", "red");
+$("#myform").validate({
+                    rules : {
+                        streetaddress: "required",
+                        mycity: "required",
+                        state: "required"
+                        
+                    },
+                    messages : {
+                        streetaddress: "please enter the street address",
+                        mycity: "Please enter the city",
+                        state: "please select the state"
+                    }
+                });
+
+
+
+
+
+
+	$("#searchbutton").click(function() { 
+  
+
+
+
+if($("#myform").valid())
+
+{            
+
+
+   
+
+
+
+		 var straddress=$("#streetaddress").val();
+		 var cty=$("#city").val();
+		 var state=$("#state").val();
+		 var deg=$("input:radio[name=degree]:checked").val();
+
+    
+  
+
+
+
+
+      $.ajax({
+       type:"GET", 
+       datatype:"json",        
+       url:"http://weatherforecastwebapp-env.elasticbeanstalk.com/index.php",
+        // headers: {'X-Requested-With': 'XMLHttpRequest'},
+    data: { str:straddress, cityname:cty, statename:state, degree:deg},
+
+success: function(output) {
+//alert(output);
+//alert(output);
+    var output=jQuery.parseJSON(output);
+   
+   $("#pagebottom").show();
+
+//    var  active=$("ul#sampleTabs li.active");
+// alert(active);
+  var summary=output["summary"];
+ 
+
+
+var long=output.longitude[0];
+var lat=output.latitude[0];
+
+// alert(long);
+// alert(lat);
+
+
+  var precipitation=output["precipitation"];
+
+  
+  var sunrise=output["sunrise"];
+  var sunset=output["sunset"];
+  var iconsrc=output["imagesrc"];
+  var temperature=output["temperature"];
+ 
+  var minimumtemperature=output["minimumtemperature"];
+  var maximumtemperature=output["maximumtemperature"];
+  var chanceofrain=output["chanceofrain"];
+  var windspeed=output["windspeed"];
+  var dewpoint=output["dewpoint"];
+  var humidity=output["humidity"];
+  var visibility=output["visibility"];
+
+
+var fbtitle="Current Weather in ".concat(cty+","+state);
+
+
+
+var imagelink=iconsrc;
+var temp=temperature;
+ var captioncontent="WEATHER INFORMATION FROM FORECAST.IO"    
+var myfbdescription=summary.concat(" , "+temp);
+
+
+  document.getElementById("windspeed").innerHTML= windspeed;
+  document.getElementById("chanceofrain").innerHTML= chanceofrain;
+  document.getElementById("humidity").innerHTML= humidity;
+  document.getElementById("visibility").innerHTML= visibility;
+  document.getElementById("dewpoint").innerHTML= dewpoint;
+  document.getElementById("precipitation").innerHTML=precipitation;
+  document.getElementById("sunset").innerHTML=sunset;
+  document.getElementById("sunrise").innerHTML= sunrise;
+  document.getElementById("mainoutputimage").src=iconsrc;
+  document.getElementById("summarynote").innerHTML="<font style=\"margin-top:10px; font-size:12px;\" color=\"white\"><strong>"+summary+"&nbsp; in "+cty+" , &nbsp;"+state+"</strong></font>";
+  document.getElementById("temperaturedisplay").innerHTML="<font style=\"padding-top:10px;padding-bottom:10px;\" color=\"white\" size=\"8px\"><strong>"+temperature+"</strong></font>";
+  document.getElementById("mintempdisplay").textContent="L:"+minimumtemperature;
+  document.getElementById("maxtempdisplay").textContent="H:"+maximumtemperature;
+if(deg=="Farenheit")
+{
+  document.getElementById("tempheader").innerHTML="Temp(<sup>o</sup>F)"
+}
+else
+{
+  document.getElementById("tempheader").innerHTML="Temp(<sup>o</sup>C)"
+}
+
+ 
+  function statusChangeCallback(response) {
+   
+    
+    if (response.status === 'connected') {
+     
+      testAPI();
+    } else if (response.status === 'not_authorized') {
+      
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into this app.';
+    } else {
+      
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into Facebook.';
+    }
+  }
+
+  
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '732609966840719',
+    cookie     : true,   
+                        
+    xfbml      : true,  
+    version    : 'v2.2' 
+  });
+
+ 
+
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+
+  };
+
+ 
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+    });
+  }
+  
+  function call_share()
+  {
+
+  FB.ui({
+ 
+  
+  method: 'feed',
+  link:'https://forecast.io',
+  picture:output["imagesrc"],
+  
+  name:fbtitle,
+  redirect_uri:'https://forecast.io',
+  
+  description:myfbdescription,
+caption:captioncontent,
+  
+  }, function(response){if (response && response.post_id) {
+                      alert('Posted Successfully.');
+                } else {
+                    alert('Not posted.');
+                    }
+                  });
+  }
+
+      $("#facebookpostbutton").on("click", function()
+  
+  {
+   
+     
+      call_share();
+  
+  });
+
+
+
+
+
+
+var summary1=output.dailydata[1].summary;
+var windspeed1=output.dailydata[1].windspeed;
+var pressure1=output.dailydata[1].pressure;
+var humidity1=output.dailydata[1].humidity;
+var sunset1=output.dailydata[1].sunsettime;
+var sunrise1=output.dailydata[1].sunrisetime;   
+
+
+
+
+
+
+var day1=output.dailydata[1].day;
+var day2=output.dailydata[2].day;
+var day3=output.dailydata[3].day;
+var day4=output.dailydata[4].day;
+var day5=output.dailydata[5].day;
+var day6=output.dailydata[6].day;
+var day7=output.dailydata[7].day;
+
+var month1=output.dailydata[1].month;
+var month2=output.dailydata[2].month;
+var month3=output.dailydata[3].month;
+var month4=output.dailydata[4].month;
+var month5=output.dailydata[5].month;
+var month6=output.dailydata[6].month;
+var month7=output.dailydata[7].month;
+
+var image1=output.dailydata[1].imagesrc;
+var image2=output.dailydata[2].imagesrc;
+var image3=output.dailydata[3].imagesrc;
+var image4=output.dailydata[4].imagesrc;
+var image5=output.dailydata[5].imagesrc;
+var image6=output.dailydata[6].imagesrc;
+var image7=output.dailydata[7].imagesrc;
+
+var minimumtemperature1=output.dailydata[1].minimumtemperature;
+var minimumtemperature2=output.dailydata[2].minimumtemperature;
+var minimumtemperature3=output.dailydata[3].minimumtemperature;
+var minimumtemperature4=output.dailydata[4].minimumtemperature;
+var minimumtemperature5=output.dailydata[5].minimumtemperature;
+var minimumtemperature6=output.dailydata[6].minimumtemperature;
+var minimumtemperature7=output.dailydata[7].minimumtemperature;
+
+var maximumtemperature1=output.dailydata[1].maximumtemperature;
+var maximumtemperature2=output.dailydata[2].maximumtemperature;
+var maximumtemperature3=output.dailydata[3].maximumtemperature;
+var maximumtemperature4=output.dailydata[4].maximumtemperature;
+var maximumtemperature5=output.dailydata[5].maximumtemperature;
+var maximumtemperature6=output.dailydata[6].maximumtemperature;
+var maximumtemperature7=output.dailydata[7].maximumtemperature;
+
+document.getElementById("day1-day").innerHTML=day1;
+document.getElementById("day1-month").innerHTML=month1;
+document.getElementById("day1-image").innerHTML="<img src="+image1+" width=40 height=40>";
+document.getElementById("day1-mintemp").innerHTML=minimumtemperature1+"<sup>o</sup>";
+document.getElementById("day1-maxtemp").innerHTML=maximumtemperature1+"<sup>o</sup>";
+
+document.getElementById("day2-day").innerHTML=day2;
+document.getElementById("day2-month").innerHTML=month2;
+document.getElementById("day2-image").innerHTML="<img src="+image2+" width=40 height=40>";
+document.getElementById("day2-mintemp").innerHTML=minimumtemperature2+"<sup>o</sup>";
+document.getElementById("day2-maxtemp").innerHTML=maximumtemperature2+"<sup>o</sup>";
+
+document.getElementById("day3-day").innerHTML=day3;
+document.getElementById("day3-month").innerHTML=month3;
+document.getElementById("day3-image").innerHTML="<img src="+image3+" width=40 height=40>";
+document.getElementById("day3-mintemp").innerHTML=minimumtemperature3+"<sup>o</sup>";
+document.getElementById("day3-maxtemp").innerHTML=maximumtemperature3+"<sup>o</sup>";
+
+document.getElementById("day4-day").innerHTML=day4;
+document.getElementById("day4-month").innerHTML=month4;
+document.getElementById("day4-image").innerHTML="<img src="+image4+" width=40 height=40>";
+document.getElementById("day4-mintemp").innerHTML=minimumtemperature4+"<sup>o</sup>";
+document.getElementById("day4-maxtemp").innerHTML=maximumtemperature4+"<sup>o</sup>";
+
+document.getElementById("day5-day").innerHTML=day5;
+document.getElementById("day5-month").innerHTML=month5;
+document.getElementById("day5-image").innerHTML="<img src="+image5+" width=40 height=40>";
+document.getElementById("day5-mintemp").innerHTML=minimumtemperature5+"<sup>o</sup>";
+document.getElementById("day5-maxtemp").innerHTML=maximumtemperature5+"<sup>o</sup>";
+
+document.getElementById("day6-day").innerHTML=day6;
+document.getElementById("day6-month").innerHTML=month6;
+document.getElementById("day6-image").innerHTML="<img src="+image6+" width=40 height=40>";
+document.getElementById("day6-mintemp").innerHTML=minimumtemperature6+"<sup>o</sup>";
+document.getElementById("day6-maxtemp").innerHTML=maximumtemperature6+"<sup>o</sup>";
+
+document.getElementById("day7-day").innerHTML=day7;
+document.getElementById("day7-month").innerHTML=month7;
+document.getElementById("day7-image").innerHTML="<img src="+image7+" width=40 height=40>";
+document.getElementById("day7-mintemp").innerHTML=minimumtemperature7+"<sup>o</sup>";
+document.getElementById("day7-maxtemp").innerHTML=maximumtemperature7+"<sup>o</sup>";
+
+
+
+
+// $(function() { 
+//     // for bootstrap 3 use 'shown.bs.tab', for bootstrap 2 use 'shown' in the next line
+//     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+//         // save the latest tab; use cookies if you like 'em better:
+//         localStorage.setItem('lastTab', $(this).attr('href'));
+//     });
+
+//     // go to the latest tab, if it exists:
+//     var lastTab = localStorage.getItem('lastTab');
+//     if (lastTab) {
+//         $('[href="' + lastTab + '"]').tab('show');
+//     }
+// });
+
+
+
+//document.getElementById("onerow2").innerHTML=day1;
+var tabletext="";
+var subtabletext="";
+var buttontype="button";
+var buttonclass="btn";
+var buttontoggle="collapse";
+document.getElementById("datafill").innerHTML="";
+
+//alert(output.dailydata[7].visibility);
+var newsummary;
+for(var i=1;i<=7;i++)
+{
+ 
+// alert("modal"+i+"image");
+ //alert(i);
+ //alert(output.dailydata[i].windspeed);
+//alert(output.dailydata[i].visibility);
+//alert(output.dailydata[i].pressure);
+var label="Weather in " +cty+ " on " +output.dailydata[i].month;
+document.getElementById("myModalLabel"+i).innerHTML="<span style=\"font-weight:bold;\">"+label+"</span>";
+newsummary="<span style=\"font-weight:bold;font-size:20px;\">"+(output.dailydata[i].day)+"</span> : " +"<span style=\"color:rgb(254,164,1);font-size:20px;\">"+(output.dailydata[i].summary)+"</span>";
+document.getElementById("modal"+i+"-onerow2").innerHTML=output.dailydata[i].sunrisetime;
+document.getElementById("modal"+i+"-onerow4").innerHTML=output.dailydata[i].sunsettime;
+document.getElementById("modal"+i+"-summary").innerHTML=newsummary;
+
+document.getElementById("modal"+i+"-onerow6").innerHTML=output.dailydata[i].humidity;
+document.getElementById("modal"+i+"-image").src=output.dailydata[i].imagesrc;
+document.getElementById("modal"+i+"-secondrow2").innerHTML=output.dailydata[i].windspeed;
+document.getElementById("modal"+i+"-secondrow4").innerHTML=output.dailydata[i].visibility;
+document.getElementById("modal"+i+"-secondrow6").innerHTML=output.dailydata[i].pressure;
+}
+for(var i=0;i<24;i++)
+{
+  
+  tabletext="";
+  subtabletext="";
+tabletext+="<tr><td>"+output.hourlydata[i].time+"</td>";
+
+tabletext+="<td><img src="+output.hourlydata[i].imagesrc+" height=40px width=40px> </td>";
+tabletext+="<td>"+output.hourlydata[i].cloudcover+"</td>";
+tabletext+="<td>"+output.hourlydata[i].temperature+"</td>";
+
+
+tabletext+= "<td><button type="+buttontype+" class="+buttonclass+" data-toggle="+buttontoggle+" data-target=\"#collapse"+i+"\"><span class=\"glyphicon glyphicon-plus\"></span></button></td></tr>";
+        
+tabletext+="<tr id=\"collapse"+i+"\" class=\"collapse\"><td style=\"background-color:rgb(238,238,238);\" colspan=\"5\"><div><table style=\"text-align:center;\" class=\"table\"><thead style=\"text-align:center;\"><th style=\"text-align:center;background-color:white;\">Wind</th><th style=\"text-align:center;background-color:white;\">Humidity</th><th style=\"text-align:center;background-color:white;\">Visibility</th><th style=\"text-align:center;background-color:white;\">Pressure</th></thead><tbody style=\"background-color:rgb(238,238,238);\" id=\"viewdetails"+i+"\" ></tbody></table></div></td></tr>";
+subtabletext+="<tr><td>"+output.hourlydata[i].windspeed+"</td>";
+subtabletext+="<td>"+output.hourlydata[i].humidity+"</td>";
+subtabletext+="<td>"+output.hourlydata[i].visibility+"</td>";
+subtabletext+="<td>"+output.hourlydata[i].pressure+"</td></tr>";
+
+$("#datafill").append(tabletext);
+$("#viewdetails"+i).append(subtabletext);
+}
+
+
+// var activeTab;
+// $('a[data-toggle="tab"]').on('shown', function (e) {
+//   activeTab = e.target;
+// })
+
+// alert(activeTab);
+// alert($(ul#navtabs li.active ));
+
+// $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+// //show selected tab / active
+//  alert( $(e.target).attr('id') );
+// });
+
+$("#basicMap").empty();               
+        var fromProjection = new OpenLayers.Projection("EPSG:4326");  
+        var toProjection   = new OpenLayers.Projection("EPSG:900913"); 
+        var position= new OpenLayers.LonLat(long,lat).transform( fromProjection, toProjection);
+        var map = new OpenLayers.Map("basicMap"); 
+        var mapnik = new OpenLayers.Layer.OSM();
+
+       var layer_cloud = new OpenLayers.Layer.XYZ(
+        "clouds",
+        "http://${s}.tile.openweathermap.org/map/clouds/${z}/${x}/${y}.png",
+        {
+            isBaseLayer: false,
+            opacity: 0.2,
+            sphericalMercator: true
+        }
+    );
+
+    var layer_precipitation = new OpenLayers.Layer.XYZ(
+        "precipitation",
+        "http://${s}.tile.openweathermap.org/map/precipitation/${z}/${x}/${y}.png",
+        {
+            isBaseLayer: false,
+            opacity: 0.4,
+            sphericalMercator: true
+        }
+    );
+
+map.addLayers([mapnik, layer_precipitation, layer_cloud]);
+map.setCenter(position,6);
+
+
+
+} <!-- end of success -->
+
+});  <!-- ajax ends-->
+
+}  <!-- end of  ifloop -->
+else
+{
+  return null;
+}
+
+	}); <!-- search button click -->
+
+
+});  <!-- end of documenttag ready -->
+
+</script>
+<style type="text/css">
+/*@media (min-width: @screen-md-min) { */
+/*#thirdtab
+{
+  background-color:rgb(46,51,56);
+}
+}*/
+  
+@media screen and ( min-width: 768px ) {
+  #thirdtab {
+    background-color:rgb(46,51,56);
+  }
+}
+
+label.error
+{
+  color:red;
+}
+
+    body
+    {
+    
+min-height: 100%;
+background: url('http://cs-server.usc.edu:45678/hw/hw8/images/bg.jpg') center center fixed; 
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+        
+    }
+    
+  .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    color: white;
+    /*cursor: default;*/
+    background-color:rgb(44,112,171);
+    border-top: 1px solid #ddd;
+    /*border-bottom-color: transparent;*/
+}
+#pagebottom
+{
+  display:none;
+}
+.nav-tabs>li>a
+{
+  color:rgb(44,112,171);
+background-color:white;
+border-top: 1px solid;
+}
+ 
+/* #myform label.error
+ {
+color:red;
+
+ } */ 
+/*.error>label
+ {
+  color:red;
+ } */
+    #forecast
+    {
+    	margin:0 auto;
+    	text-align: center;
+    }
+    .table-striped > tbody > tr:nth-child(2n) > td {
+   background-color: rgb(241,221,221)
+
+}
+#facebookpostbutton
+{
+  background: url('http://cs-server.usc.edu:45678/hw/hw8/images/fb_icon.png');
+  background-size: 100%;
+  width:18px;
+  height:18px;
+}
+#subtab1
+{
+  display:block;
+  color:white;
+  font-size:9px;
+  text-align:center;
+  background-color:rgb(53,124,180);
+  padding:8px;
+  border-radius:10px;
+}
+#subtab2
+{
+  display:block;
+  color:white;
+  font-size:9px;
+  text-align:center;
+  background-color:rgb(235,67,67) ;
+  padding:8px;
+  border-radius:10px;
+}
+#subtab3
+{
+  display:block;
+  color:white;
+  font-size:9px;
+  text-align:center;
+  background-color:rgb(229,141,78);
+  padding:8px;
+  border-radius:10px;
+}
+#subtab4
+{
+  display:block;
+  color:white;
+  font-size:9px;
+  text-align:center;
+  background-color:rgb(166,163,56);
+  padding:8px;
+  border-radius:10px;
+}
+#subtab5
+{
+  display:block;
+  color:white;
+  font-size:9px;
+  text-align:center;
+  background-color:rgb(150,111,166);
+  padding:8px;
+  border-radius:10px;
+}
+#subtab6
+{
+  display:block;
+  color:white;
+  font-size:9px;
+  text-align:center;
+  background-color:rgb(242,123,125);
+  padding:8px;
+  border-radius:10px;
+}
+#subtab7
+{
+  display:block;
+  color:white;
+  font-size:9px;
+  text-align:center;
+  background-color:rgb(205,68,112);
+  padding:8px;
+  border-radius:10px;
+}
+</style>
+</head>
+<body>
+
+
+    <div class="container">
+   
+      <div id="forecast">
+      <h1>Forecast Search</h1>
+      </div>
+
+    
+    
+      
+    <form class="form-inline" id="myform" name="form" role="form" style="background-color:rgba(0,0,0,0.2);">
+     <div class="row" style="padding:15px;"> 
+    
+     <div class="form-group col-xs-12 col-md-3" style="padding:3px;">
+     <label for="streetaddress"><span style="color:white;">Street Address:</span><span style="color:red">*</span></label>
+     <input type="text" name="streetaddress" class="form-control" id="streetaddress" style="width:100%" placeholder="Enter Street Address">
+    </div>
+
+
+    <div class="form-group col-xs-12 col-md-2" style="padding:3px;">
+    <label for="mycity"><span style="color:white;">City:</span><span style="color:red">*</span></label>
+     <input type="text" name="mycity" class="form-control" id="city" style="width:100%" placeholder="Enter the City name">
+    </div>
+            
+  <div class="form-group col-xs-12 col-md-2" style="padding:3px;">
+  
+  <label for="state"><span style="color:white;">State:</span><span style="color:red">*</span></label>
+    <SELECT name="state" class="form-control" id="state" style="width:100%">
+  <OPTION disabled selected value="manu" >Select your state....</OPTION>
+  <OPTION value="AL">Alabama</OPTION>
+<OPTION value="AK">Alaska</OPTION>
+<OPTION value="AZ">Arizona</OPTION>
+<OPTION value="AR">Arkansas</OPTION>
+<OPTION value="CA">California</OPTION>
+<OPTION value="CO">Colorado</OPTION>
+<OPTION value="CT">Connecticut</OPTION>
+<OPTION value="DE">Delaware</OPTION>
+<OPTION value="DC">District Of Columbia</OPTION>
+<OPTION value="FL">Florida</OPTION>
+<OPTION value="GA">Georgia</OPTION>
+<OPTION value="HI">Hawaii</OPTION>
+<OPTION value="ID">Idaho</OPTION>
+<OPTION value="IL">Illinois</OPTION>
+<OPTION value="IN">Indiana</OPTION>
+<OPTION value="IA">Iowa</OPTION>
+<OPTION value="KS">Kansas</OPTION>
+<OPTION value="KY">Kentucky</OPTION>
+<OPTION value="LA">Lousiana</OPTION>
+<OPTION value="ME">Maine</OPTION>
+<OPTION value="MD">Maryland</OPTION>
+<OPTION value="MA">Massachusetts</OPTION>
+<OPTION value="MI">Michigan</OPTION>
+<OPTION value="MN">Minnesota</OPTION>
+<OPTION value="MS">Mississippi</OPTION>
+<OPTION value="MO">Missouri</OPTION>
+<OPTION value="MT">Montana</OPTION>
+<OPTION value="NE">Nebraska</OPTION>
+<OPTION value="NV">Nevada</OPTION>
+<OPTION value="NH">New Hampshire</OPTION>
+<OPTION value="NJ">New Jersey</OPTION>
+<OPTION value="NM">New Mexico</OPTION>
+<OPTION value="NY">New York</OPTION>
+<OPTION value="NC">North Carolina</OPTION>
+<OPTION value="ND">North Dakota</OPTION>
+<OPTION value="OH">Ohio</OPTION>
+<OPTION value="OK">Oklahoma</OPTION>
+<OPTION value="OR">Oregon</OPTION>
+<OPTION value="PA">Pennsylvania</OPTION>
+<OPTION value="RI">Rhode Island</OPTION>
+<OPTION value="SC">South Carolina</OPTION>
+<OPTION value="SD">South Dakota</OPTION>
+<OPTION value="TN">Tennessee</OPTION>
+<OPTION value="TX">Texas</OPTION>
+<OPTION value="UT">Utah</OPTION>
+<OPTION value="VT">Vermount</OPTION>
+<OPTION value="VA">Virginia</OPTION>
+<OPTION value="WA">Washington</OPTION>
+<OPTION value="WV">West Virginia</OPTION>
+<OPTION value="WI">Wisconsin</OPTION>
+<OPTION value="WY">Wyoming</OPTION>
+</SELECT>
+</div>
+
+
+
+<div class="form-group col-xs-12 col-md-2" style="padding-left:3px;paddinng-right:3px;">
+<label for="degree"><span style="color:white;">Degree:</span><span style="color:red">*</span></label>
+<div id="radioparent">
+<input  type="radio" name="degree" value="Celsius">Celsius 
+<input  type="radio" name="degree" value="Farenheit" checked="true">Farenheit
+</div>
+</div>
+  
+
+  
+<div class="form-group col-right col-xs-12 col-md-3" style="padding-top:25px;float:right;padding-left:5%;">
+<div style="float:right;">
+<button type="button" class="btn btn-primary" id="searchbutton"><span class="glyphicon glyphicon-search" ></span> Search</button>
+
+ <button type="button" class="btn btn-default" id="clear" onclick="clearall();"><span class="glyphicon glyphicon-refresh" hidden></span> Clear</button></div>
+ </div>
+  
+
+ </div>
+ <div class="row">
+ <div style="float:right;text-align:center;display:inline-block;margin-right:6%;">
+ <p style="display:inline-block;color:white;"> Powered By:</p>
+<a href="http://forecast.io" target="_blank"><img src="http://cs-server.usc.edu:45678/hw/hw8/images/forecast_logo.png" width="50px" height="50px"></a>
+
+ </div>
+ </div>
+ </form>
+<div id="break" style="color:white;">
+<hr>
+  </div>
+ <div class="row" style="padding:15px;">
+<div id="pagebottom" >
+
+    <ul class="nav nav-tabs" id="navtabs">
+    <li class="active"><a data-toggle="tab" href="#firsttab">Right Now</a></li>
+    <li><a data-toggle="tab" href="#secondtab">Next 24 Hours</a></li>
+    <li><a data-toggle="tab" href="#thirdtab">Next 7 Days</a></li>
+    </ul>
+
+       <div class="tab-content" style="margin:0px;padding:0px;">
+
+     
+        <div id="firsttab" class="tab-pane fade in active col-sm-12" style="padding:0px;">
+           
+           <div  class="col-sm-6" style="text-align:center;margin:0px;padding:0px;">
+               
+               <div class="row" style="padding:0px;margin:0px;">
+                 <div class="col-sm-6" style="background-color:rgb(244,125,125); text-align:center;margin:0px;padding:0px;"> <img id="mainoutputimage" style="text-align:center;margin:0px;padding:0px;" src="" width="120" height="130" >
+                 </div>
+                 <div class="col-sm-6" style="background-color:rgb(244,125,125);height:130;margin:0px;padding:0px;" >
+                     <div id="summarynote" style="text-align:center;margin:0px;padding:0px;"> </div>
+                     <div style="text-align:center;margin:0px;padding:0px;" id="temperaturedisplay"></div>
+                     <div style="text-align:center;margin:0px;padding:0px;"><span id="mintempdisplay" style="color:blue"></span>
+                                       <span style="color:blue">&deg;</span> |
+                                       <span style="color:green" id="maxtempdisplay"></span><span style="color:green">&deg; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span>
+                                       <span style="text-align:right;margin-right:-10px"><button id="facebookpostbutton"></span></div>
+                  </div>
+               </div>
+
+              <div class="row" style="padding:0px;margin:0px;">
+                <table class="table table-striped" >
+                  <tbody>
+           <tr>
+                <td>Precipitation</td>
+                <td id="precipitation"></td>
+           </tr>
+           <tr>
+                <td> Chance of Rain </td>
+                <td id="chanceofrain"></td>
+          
+           <tr>
+               <td>Wind Speed</td>
+              <td id="windspeed"></td>
+          </tr>
+          <tr>
+               <td>Dew Point</td>
+               <td id="dewpoint"></td>
+          </tr>
+          <tr>
+               <td>Humidity</td>
+               <td id="humidity"></td>
+          </tr>
+           <tr>
+               <td>Visibility</td>
+        <td id="visibility"></td>
+      </tr> 
+    <tr>
+        <td>Sunrise</td>
+        <td id="sunrise"></td>
+      </tr>
+    <tr>
+        <td>Sunset</td>
+        <td id="sunset"></td>
+      </tr>
+  </tbody>
+        </table>
+        </div>
+
+    </div>
+
+
+     <div class="col-sm-6 olmap" id="basicMap" style="height:440px;margin:0px;padding:0px;">
+    
+    </div>
+
+</div>   <!-- end of first tab -->
+
+
+<div id="secondtab" class="tab-pane fade in col-sm-12" style="margin:0px;padding:0px;">
+
+<table class="table" style="text-align:center;margin:0px;padding:0px;">
+<thead style="background-color:rgb(47,112,167);height:19px;text-align:center;">
+<tr>
+<th style="color:white;text-align:center;">Time</th>
+<th style="color:white;text-align:center;">Summary</th>
+<th style="color:white;text-align:center;">Cloud Cover</th>
+<th id="tempheader" style="color:white;text-align:center;"></th>
+<th style="color:white;text-align:center;">View Details</th>
+</tr>
+</thead>
+<tbody id="datafill" style="background-color:white;text-align:center;">
+</tbody>
+</table>
+
+</div> <!-- end of second tab -->
+
+
+
+<div id="thirdtab" class="tab-pane fade in col-sm-12" style="margin:0px;padding:0px;">
+<br>
+
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal"></div>
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal"></div>
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal1" style="padding:0px;margin:5px;">
+<div id="subtab1" style="padding:0px;">
+<div class="row" id="day1-day" style="text-align:center;padding-bottom:5px;padding-top:3px;"></div>
+<div class="row" id="day1-month" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day1-image" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day1-static1" style="text-align:center;padding-bottom:5px;">Min</br>Temp</div>
+<div class="row" id="day1-mintemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+<div class="row" id="day1-static2" style="text-align:center;padding-bottom:5px;padding-bottom:5px;">Max</br>Temp</div>
+<div class="row" id="day1-maxtemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+</div>
+</div>
+
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal2" style="padding:0px;margin:5px;">
+<div id="subtab2"  style="padding:0px;">
+<div class="row" id="day2-day" style="text-align:center;padding-bottom:5px;padding-top:3px;"></div>
+<div class="row" id="day2-month" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day2-image" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day2-static1" style="text-align:center;padding-bottom:5px;">Min</br>Temp</div>
+<div class="row" id="day2-mintemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+<div class="row" id="day2-static2" style="text-align:center;padding-bottom:5px;">Max</br>Temp</div>
+<div class="row" id="day2-maxtemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+</div>
+</div>
+
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal3" style="padding:0px;margin:5px;" >
+<div id="subtab3"  style="padding:0px;">
+<div class="row" id="day3-day" style="text-align:center;padding-bottom:5px;padding-top:3px;"></div>
+<div class="row" id="day3-month" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day3-image" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day3-static1" style="text-align:center;padding-bottom:5px;"> Min </br>Temp</div>
+<div class="row" id="day3-mintemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+<div class="row" id="day3-static2" style="text-align:center;padding-bottom:5px;">Max</br>Temp</div>
+<div class="row" id="day3-maxtemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+</div>
+</div>
+
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal4" style="padding:0px;margin:5px;">
+<div id="subtab4"  style="padding:0px;">
+<div class="row" id="day4-day" style="text-align:center;padding-bottom:5px;padding-top:3px;"></div>
+<div class="row" id="day4-month" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day4-image" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day4-static1" style="text-align:center;padding-bottom:5px;"> Min </br>Temp</div>
+<div class="row" id="day4-mintemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+<div class="row" id="day4-static2" style="text-align:center;padding-bottom:5px;">Max</br>Temp</div>
+<div class="row" id="day4-maxtemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+</div>
+</div>
+
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal5" style="padding:0px;margin:5px;">
+<div id="subtab5"  style="padding:0px;">
+<div class="row" id="day5-day" style="text-align:center;padding-bottom:5px;padding-top:3px;"></div>
+<div class="row" id="day5-month" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day5-image" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day5-static1" style="text-align:center;padding-bottom:5px;"> Min </br>Temp</div>
+<div class="row" id="day5-mintemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+<div class="row" id="day5-static2" style="text-align:center;padding-bottom:5px;">Max</br>Temp</div>
+<div class="row" id="day5-maxtemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+</div>
+</div>
+
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal6" style="padding:0px;margin:5px;">
+<div id="subtab6"  style="padding:0px;">
+<div class="row" id="day6-day" style="text-align:center;padding-bottom:5px;padding-top:3px;"></div>
+<div class="row" id="day6-month" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day6-image" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day6-static1" style="text-align:center;padding-bottom:5px;"> Min </br>Temp</div>
+<div class="row" id="day6-mintemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+<div class="row" id="day6-static2" style="text-align:center;padding-bottom:5px;">Max</br>Temp</div>
+<div class="row" id="day6-maxtemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+</div>
+</div>
+
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal7" style="padding:0px;margin:5px;">
+<div id="subtab7"  style="padding:0px;">
+<div class="row" id="day7-day" style="text-align:center;padding-bottom:5px;padding-top:3px;"></div>
+<div class="row" id="day7-month" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day7-image" style="text-align:center;padding-bottom:5px;"></div>
+<div class="row" id="day7-static1" style="text-align:center;padding-bottom:5px;">Min </br> Temp</div>
+<div class="row" id="day7-mintemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+<div class="row" id="day7-static2" style="text-align:center;padding-bottom:5px;">Max</br>Temp</div>
+<div class="row" id="day7-maxtemp" style="text-align:center;font-weight:bold;font-size:18px;padding-bottom:5px;"></div>
+</div>
+</div>
+
+
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal"></div>
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal"></div>
+<div class="col-sm-1" data-toggle="modal" data-target="#GSCCModal"></div>
+
+
+<div id="GSCCModal1" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;  </button>
+        <h4 class="modal-title" id="myModalLabel1"></h4>
+      </div>
+      <div class="modal-body">
+        
+        <div class="row">
+        <div class="col-sm-12" id="imagediv" style="text-align:center">
+        <img id="modal1-image" src="" height="100" width="100">
+        </div>
+        </div>
+        
+        <div class="row">
+        <div class="col-sm-12" id="modal1-summary" style="text-align:center">
+        <p>Tuesday: Mostly Couldy Through out the day</p>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal1-onerow1" style="font-weight:bold">Sunrise Time</div>
+        <div id="modal1-onerow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal1-onerow3" style="font-weight:bold"> SunsetTime</div>
+        <div id="modal1-onerow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal1-onerow5" style="font-weight:bold">Humidity</div>
+        <div id="modal1-onerow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal1-secondrow1" style="font-weight:bold">Wind Speed</div>
+        <div id="modal1-secondrow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal1-secondrow3" style="font-weight:bold">Visibility</div>
+        <div id="modal1-secondrow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal1-secondrow5" style="font-weight:bold">Pressure</div>
+        <div id="modal1-secondrow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+</div><!--modal body -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    
+    </div>
+  </div>
+</div> <!-- modal end -->
+
+
+
+
+<div id="GSCCModal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;  </button>
+        <h4 class="modal-title" id="myModalLabel2"></h4>
+      </div>
+      <div class="modal-body">
+        
+        <div class="row">
+        <div class="col-sm-12" id="imagediv" style="text-align:center">
+        <img id="modal2-image" src="" height="100" width="100">
+        </div>
+        </div>
+        
+        <div class="row">
+        <div class="col-sm-12" id="modal2-summary" style="text-align:center">
+        <p>Tuesday: Mostly Couldy Through out the day</p>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal2-onerow1" style="font-weight:bold">Sunrise Time</div>
+        <div id="modal2-onerow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal2-onerow3" style="font-weight:bold"> SunsetTime</div>
+        <div id="modal2-onerow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal2-onerow5" style="font-weight:bold">Humidity</div>
+        <div id="modal2-onerow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal2-secondrow1" style="font-weight:bold">Wind Speed</div>
+        <div id="modal2-secondrow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal2-secondrow3" style="font-weight:bold">Visibility</div>
+        <div id="modal2-secondrow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal2-secondrow5" style="font-weight:bold">Pressure</div>
+        <div id="modal2-secondrow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+</div><!--modal body -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    
+    </div>
+  </div>
+</div> <!-- modal end -->
+
+
+
+
+<div id="GSCCModal3" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;  </button>
+        <h4 class="modal-title" id="myModalLabel3"></h4>
+      </div>
+      <div class="modal-body">
+        
+        <div class="row">
+        <div class="col-sm-12" id="imagediv" style="text-align:center">
+        <img id="modal3-image" src="" height="100" width="100">
+        </div>
+        </div>
+        
+        <div class="row">
+        <div class="col-sm-12" id="modal3-summary" style="text-align:center">
+        <p>Tuesday: Mostly Couldy Through out the day</p>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal3-onerow1" style="font-weight:bold">Sunrise Time</div>
+        <div id="modal3-onerow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal3-onerow3" style="font-weight:bold"> SunsetTime</div>
+        <div id="modal3-onerow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal3-onerow5" style="font-weight:bold">Humidity</div>
+        <div id="modal3-onerow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal3-secondrow1" style="font-weight:bold">Wind Speed</div>
+        <div id="modal3-secondrow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal3-secondrow3" style="font-weight:bold">Visibility</div>
+        <div id="modal3-secondrow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal3-secondrow5" style="font-weight:bold">Pressure</div>
+        <div id="modal3-secondrow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+</div><!--modal body -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    
+    </div>
+  </div>
+</div> <!-- modal end -->
+
+
+
+<div id="GSCCModal4" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;  </button>
+        <h4 class="modal-title" id="myModalLabel4"></h4>
+      </div>
+      <div class="modal-body">
+        
+        <div class="row">
+        <div class="col-sm-12" id="imagediv" style="text-align:center">
+        <img  id="modal4-image" src="" height="100" width="100">
+        </div>
+        </div>
+        
+        <div class="row">
+        <div class="col-sm-12" id="modal4-summary" style="text-align:center">
+        <p>Tuesday: Mostly Couldy Through out the day</p>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal4-onerow1" style="font-weight:bold">Sunrise Time</div>
+        <div id="modal4-onerow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal4-onerow3" style="font-weight:bold"> SunsetTime</div>
+        <div id="modal4-onerow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal4-onerow5" style="font-weight:bold">Humidity</div>
+        <div id="modal4-onerow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal4-secondrow1" style="font-weight:bold">Wind Speed</div>
+        <div id="modal4-secondrow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal4-secondrow3" style="font-weight:bold">Visibility</div>
+        <div id="modal4-secondrow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal4-secondrow5" style="font-weight:bold">Pressure</div>
+        <div id="modal4-secondrow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+</div><!--modal body -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    
+    </div>
+  </div>
+</div> <!-- modal end -->
+
+
+
+<div id="GSCCModal5" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;  </button>
+        <h4 class="modal-title" id="myModalLabel5"></h4>
+      </div>
+      <div class="modal-body">
+        
+        <div class="row">
+        <div class="col-sm-12" id="imagediv" style="text-align:center">
+        <img id="modal5-image" src="" height="100" width="100">
+        </div>
+        </div>
+        
+        <div class="row">
+        <div class="col-sm-12" id="modal5-summary" style="text-align:center">
+        <p>Tuesday: Mostly Couldy Through out the day</p>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal5-onerow1" style="font-weight:bold">Sunrise Time</div>
+        <div id="modal5-onerow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal5-onerow3" style="font-weight:bold"> SunsetTime</div>
+        <div id="modal5-onerow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal5-onerow5" style="font-weight:bold">Humidity</div>
+        <div id="modal5-onerow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal5-secondrow1" style="font-weight:bold">Wind Speed</div>
+        <div id="modal5-secondrow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal5-secondrow3" style="font-weight:bold">Visibility</div>
+        <div id="modal5-secondrow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal5-secondrow5" style="font-weight:bold">Pressure</div>
+        <div id="modal5-secondrow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+</div><!--modal body -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    
+    </div>
+  </div>
+</div> <!-- modal end -->
+
+
+
+<div id="GSCCModal6" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;  </button>
+        <h4 class="modal-title" id="myModalLabel6"></h4>
+      </div>
+      <div class="modal-body">
+        
+        <div class="row">
+        <div class="col-sm-12" id="imagediv" style="text-align:center">
+        <img id="modal6-image" src="" height="100" width="100">
+        </div>
+        </div>
+        
+        <div class="row">
+        <div class="col-sm-12" id="modal6-summary" style="text-align:center">
+        <p>Tuesday: Mostly Couldy Through out the day</p>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal6-onerow1" style="font-weight:bold">Sunrise Time</div>
+        <div id="modal6-onerow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal6-onerow3" style="font-weight:bold"> SunsetTime</div>
+        <div id="modal6-onerow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal6-onerow5" style="font-weight:bold">Humidity</div>
+        <div id="modal6-onerow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal6-secondrow1" style="font-weight:bold">Wind Speed</div>
+        <div id="modal6-secondrow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal6-secondrow3" style="font-weight:bold">Visibility</div>
+        <div id="modal6-secondrow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal6-secondrow5" style="font-weight:bold">Pressure</div>
+        <div id="modal6-secondrow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+</div><!--modal body -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    
+    </div>
+  </div>
+</div> <!-- modal end -->
+
+
+
+
+
+<div id="GSCCModal7" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;  </button>
+        <h4 class="modal-title" id="myModalLabel7"></h4>
+      </div>
+      <div class="modal-body">
+        
+        <div class="row">
+        <div class="col-sm-12" id="imagediv" style="text-align:center">
+        <img id="modal7-image" src="" height="100" width="100">
+        </div>
+        </div>
+        
+        <div class="row">
+        <div class="col-sm-12" id="modal7-summary" style="text-align:center">
+        <p>Tuesday: Mostly Couldy Through out the day</p>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal7-onerow1" style="font-weight:bold">Sunrise Time</div>
+        <div id="modal7-onerow2">"</div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal7-onerow3" style="font-weight:bold"> SunsetTime</div>
+        <div id="modal7-onerow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal7-onerow5" style="font-weight:bold">Humidity</div>
+        <div id="modal7-onerow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+        <div class="row">
+        <div class="col-sm-12" id="firstrow" style="text-align:center">
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal7-secondrow1" style="font-weight:bold">Wind Speed</div>
+        <div id="modal7-secondrow2"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal7-secondrow3" style="font-weight:bold">Visibility</div>
+        <div id="modal7-secondrow4"></div>
+        </div>
+        <div class="col-sm-4" id="firstrow" style="text-align:center"> 
+        <div id="modal7-secondrow5" style="font-weight:bold">Pressure</div>
+        <div id="modal7-secondrow6"></div>
+        </div>
+        </div>
+        </div>
+
+
+     </div><!--modal body -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    
+    </div>
+  </div>
+</div> <!-- modal end -->
+
+
+</div> <!-- end of thirdtab -->
+
+
+</div> <!-- end of tab content -->
+</div>
+</div>
+ <!-- </div>  -->
+</div>
+<noscript>
+</body>
+</html>
